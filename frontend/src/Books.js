@@ -108,31 +108,64 @@ function Books({ isSuperuser }) {
     }
   };
 
-  const updateBook = async (book) => {
-    const title = prompt("New Title:", book.title);
-    const author = prompt("New Author:", book.author);
-    const copies = prompt("Total Copies:", book.total_copies);
+    const updateBook = async (book) => {
+    const token = localStorage.getItem("token");
 
-    if (!title || !author || !copies) return;
+    const newTitle = prompt("Enter new title:", book.title);
+    if (!newTitle || !newTitle.trim()) {
+        alert("Title is required.");
+        return;
+    }
 
-    await fetch(`http://127.0.0.1:8000/api/books/${book.id}/`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        title,
-        author,
-        isbn: book.isbn,
-        total_copies: parseInt(copies),
-        available_copies: parseInt(copies),
-      }),
-    });
+    const newAuthor = prompt("Enter new author:", book.author);
+    if (!newAuthor || !newAuthor.trim()) {
+        alert("Author is required.");
+        return;
+    }
 
-    alert("Book updated!");
-    fetchBooks();
-  };
+    const newCopies = prompt("Enter total copies:", book.total_copies);
+    if (!newCopies) {
+        alert("Total copies is required.");
+        return;
+    }
+
+    const copies = parseInt(newCopies);
+    if (isNaN(copies) || copies <= 0) {
+        alert("Total copies must be a positive number.");
+        return;
+    }
+
+    try {
+        const response = await fetch(
+        `http://127.0.0.1:8000/api/books/${book.id}/`,
+        {
+            method: "PUT",
+            headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+            title: newTitle.trim(),
+            author: newAuthor.trim(),
+            isbn: book.isbn,
+            total_copies: copies,
+            available_copies: copies,
+            }),
+        }
+        );
+
+        if (response.status === 200) {
+        alert("Book updated successfully!");
+        fetchBooks();
+        } else {
+        alert("Update failed. Please provide valid details.");
+        }
+    } catch (error) {
+        console.error("Update error:", error);
+        alert("Server error while updating book.");
+    }
+    };
+
 
   // 🔍 SEARCH FILTER
   const filteredBooks = books.filter(

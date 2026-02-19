@@ -11,22 +11,47 @@ import {
 } from "@mui/material";
 
 function AddBook() {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [isbn, setIsbn] = useState("");
-  const [totalCopies, setTotalCopies] = useState("");
+  const [form, setForm] = useState({
+    title: "",
+    author: "",
+    isbn: "",
+    totalCopies: "",
+  });
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const token = localStorage.getItem("token");
 
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const validateForm = () => {
+    if (!form.title.trim()) return "Book title is required.";
+    if (!form.author.trim()) return "Author name is required.";
+    if (!form.isbn.trim()) return "ISBN is required.";
+    if (!form.totalCopies) return "Total copies is required.";
+
+    const copies = parseInt(form.totalCopies);
+    if (isNaN(copies) || copies <= 0) {
+      return "Total copies must be a positive number.";
+    }
+
+    if (form.isbn.length < 5) {
+      return "ISBN must be at least 5 characters.";
+    }
+
+    return null;
+  };
+
   const handleAddBook = async () => {
     setError("");
     setSuccess("");
 
-    // 🔴 Validation
-    if (!title || !author || !isbn || !totalCopies) {
-      setError("All fields are required.");
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -38,11 +63,11 @@ function AddBook() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title: title,
-          author: author,
-          isbn: isbn,
-          total_copies: parseInt(totalCopies),
-          available_copies: parseInt(totalCopies),
+          title: form.title.trim(),
+          author: form.author.trim(),
+          isbn: form.isbn.trim(),
+          total_copies: parseInt(form.totalCopies),
+          available_copies: parseInt(form.totalCopies),
         }),
       });
 
@@ -50,12 +75,16 @@ function AddBook() {
 
       if (response.status === 201) {
         setSuccess("Book added successfully!");
-        setTitle("");
-        setAuthor("");
-        setIsbn("");
-        setTotalCopies("");
+        setForm({
+          title: "",
+          author: "",
+          isbn: "",
+          totalCopies: "",
+        });
+      } else if (data.isbn) {
+        setError("A book with this ISBN already exists.");
       } else {
-        setError(data.detail || "Failed to add book.");
+        setError("Failed to add book. Please check details.");
       }
     } catch (err) {
       console.error(err);
@@ -64,61 +93,66 @@ function AddBook() {
   };
 
   return (
-    <Card elevation={4}>
+    <Card elevation={0} sx={{ border: "1px solid #e5e7eb", mb: 3 }}>
       <CardContent>
         <Typography variant="h5" gutterBottom>
-          📚 Add New Book (Admin)
+          Add New Book
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" variant="outlined" sx={{ mb: 2 }}>{success}</Alert>}
 
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <TextField
               label="Book Title"
+              name="title"
               fullWidth
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              required
+              value={form.title}
+              onChange={handleChange}
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
             <TextField
               label="Author"
+              name="author"
               fullWidth
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
+              required
+              value={form.author}
+              onChange={handleChange}
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
             <TextField
               label="ISBN"
+              name="isbn"
               fullWidth
-              value={isbn}
-              onChange={(e) => setIsbn(e.target.value)}
+              required
+              value={form.isbn}
+              onChange={handleChange}
+              helperText="Must be unique"
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
             <TextField
               label="Total Copies"
+              name="totalCopies"
               type="number"
               fullWidth
-              value={totalCopies}
-              onChange={(e) => setTotalCopies(e.target.value)}
+              required
+              value={form.totalCopies}
+              onChange={handleChange}
+              inputProps={{ min: 1 }}
             />
           </Grid>
         </Grid>
 
         <Box mt={3}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={handleAddBook}
-          >
+          <Button variant="contained" onClick={handleAddBook}>
             Add Book
           </Button>
         </Box>

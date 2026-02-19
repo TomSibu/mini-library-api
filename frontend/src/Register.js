@@ -8,27 +8,44 @@ import {
   Box,
   Alert,
   Stack,
+  Grid,
 } from "@mui/material";
 
 function Register({ onRegisterSuccess }) {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+  });
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const validateForm = () => {
+    if (!form.username.trim()) return "Username is required.";
+    if (!form.email.trim()) return "Email is required.";
+    if (!form.password.trim()) return "Password is required.";
+
+    if (form.password.length < 6) {
+      return "Password must be at least 6 characters long.";
+    }
+
+    return null; // first_name & last_name are OPTIONAL
+  };
 
   const handleRegister = async () => {
     setError("");
     setSuccess("");
 
-    // 🔒 Required Field Validation (Compulsory fields)
-    if (!username.trim() || !email.trim() || !password.trim()) {
-      setError("All fields (Username, Email, Password) are required.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -41,9 +58,11 @@ function Register({ onRegisterSuccess }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username,
-            email,
-            password,
+            username: form.username.trim(),
+            email: form.email.trim(),
+            password: form.password,
+            first_name: form.first_name.trim(), // optional
+            last_name: form.last_name.trim(),   // optional
           }),
         }
       );
@@ -51,24 +70,24 @@ function Register({ onRegisterSuccess }) {
       const data = await response.json();
 
       if (response.status === 201) {
-        setSuccess("Account created successfully. Please login.");
-        setUsername("");
-        setEmail("");
-        setPassword("");
+        setSuccess("Account created successfully! Redirecting to login...");
+        setForm({
+          username: "",
+          email: "",
+          password: "",
+          first_name: "",
+          last_name: "",
+        });
 
-        // Auto return to login after 1.5 seconds
         setTimeout(() => {
           onRegisterSuccess();
         }, 1500);
+      } else if (data.username) {
+        setError("Username already exists.");
+      } else if (data.email) {
+        setError("Invalid email address.");
       } else {
-        // Clean error message (not raw JSON)
-        if (data.username) {
-          setError("Username already exists.");
-        } else if (data.email) {
-          setError("Invalid email address.");
-        } else {
-          setError("Registration failed. Please try again.");
-        }
+        setError("Registration failed. Please check details.");
       }
     } catch (error) {
       console.error("Register error:", error);
@@ -84,7 +103,7 @@ function Register({ onRegisterSuccess }) {
         </Typography>
 
         <Typography variant="body2" color="text.secondary" mb={2}>
-          Register a new library account
+          Required: Username, Email, Password | Optional: First & Last Name
         </Typography>
 
         <Stack spacing={2}>
@@ -100,34 +119,58 @@ function Register({ onRegisterSuccess }) {
             </Alert>
           )}
 
+          {/* Required Fields */}
           <TextField
-            label="Username"
-            placeholder="Enter your username"
+            label="Username *"
+            name="username"
             fullWidth
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={form.username}
+            onChange={handleChange}
           />
 
           <TextField
-            label="Email"
+            label="Email *"
             type="email"
-            placeholder="Enter your email"
+            name="email"
             fullWidth
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={handleChange}
           />
 
           <TextField
-            label="Password"
+            label="Password *"
             type="password"
-            placeholder="Enter your password"
+            name="password"
             fullWidth
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={form.password}
+            onChange={handleChange}
           />
+
+          {/* Optional Fields */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="First Name (Optional)"
+                name="first_name"
+                fullWidth
+                value={form.first_name}
+                onChange={handleChange}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Last Name (Optional)"
+                name="last_name"
+                fullWidth
+                value={form.last_name}
+                onChange={handleChange}
+              />
+            </Grid>
+          </Grid>
 
           <Box display="flex" gap={2} mt={1}>
             <Button
