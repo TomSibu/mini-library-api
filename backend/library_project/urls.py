@@ -31,4 +31,9 @@ urlpatterns = [
     # GET /api/books/{id}/
     # PUT /api/books/{id}/
     # DELETE /api/books/{id}/
+
+    path("api/", include("borrows.urls")),  # Include URLs from the borrows app
+    # POST /api/borrow/{book_id}/
+    # POST /api/return/{book_id}/
+    # GET /api/my-borrows/
 ]
