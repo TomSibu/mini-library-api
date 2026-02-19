@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import Register from "./Register";
+import ForgotPassword from "./ForgotPassword";
+import { Link } from "@mui/material";
+
+
 import {
   TextField,
   Button,
@@ -13,6 +17,8 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
 
   const handleLogin = async () => {
     try {
@@ -37,9 +43,20 @@ function Login() {
     }
   };
 
-  if (showRegister) {
-    return <Register onRegisterSuccess={() => setShowRegister(false)} />;
-  }
+    // Show Register Page
+    if (showRegister) {
+    return (
+        <Register onRegisterSuccess={() => setShowRegister(false)} />
+    );
+    }
+
+    // Show Forgot Password Page
+    if (showForgotPassword) {
+    return (
+        <ForgotPassword onBack={() => setShowForgotPassword(false)} />
+    );
+    }
+
 
   return (
     <Card elevation={4}>
@@ -63,6 +80,16 @@ function Login() {
             fullWidth
             onChange={(e) => setPassword(e.target.value)}
           />
+          
+            <Link
+            component="button"
+            variant="body2"
+            underline="hover"
+            sx={{ alignSelf: "flex-end", color: "text.secondary" }}
+            onClick={() => setShowForgotPassword(true)}
+            >
+            Forgot Password?
+            </Link>
 
           <Button
             variant="contained"

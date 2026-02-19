@@ -4,6 +4,8 @@ import Books from "./Books";
 import DeleteAccount from "./DeleteAccount";
 import AddBook from "./AddBook";
 import { jwtDecode } from "jwt-decode";
+import AdminUsers from "./AdminUsers";
+
 
 // MUI Components
 import {
@@ -103,6 +105,9 @@ function App() {
         {isSuperuser && (
           <Box mb={4}>
             <AddBook />
+            {isSuperuser && (
+              <AdminUsers />
+            )}
           </Box>
         )}
 
