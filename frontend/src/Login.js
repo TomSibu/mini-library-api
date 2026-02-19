@@ -1,5 +1,13 @@
 import React, { useState } from "react";
 import Register from "./Register";
+import {
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+} from "@mui/material";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -20,54 +28,60 @@ function Login() {
 
       if (data.access) {
         localStorage.setItem("token", data.access);
-        alert("Login Successful!");
         window.location.reload();
       } else {
-        alert("Login Failed: " + (data.detail || "Invalid credentials"));
+        alert("Login Failed");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Server error during login");
     }
   };
 
-  // 👇 If user clicks register, show register page
   if (showRegister) {
-    return (
-      <Register
-        onRegisterSuccess={() => setShowRegister(false)}
-      />
-    );
+    return <Register onRegisterSuccess={() => setShowRegister(false)} />;
   }
 
   return (
-    <div>
-      <h2>Login</h2>
+    <Card elevation={4}>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          Login
+        </Typography>
 
-      <input
-        placeholder="Username"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <br /><br />
+        <Box display="flex" flexDirection="column" gap={2}>
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br /><br />
+          <TextField
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      <button onClick={handleLogin}>Login</button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleLogin}
+          >
+            Login
+          </Button>
 
-      <br /><br />
-
-      <button
-        onClick={() => setShowRegister(true)}
-        style={{ backgroundColor: "green", color: "white" }}
-      >
-        Create New Account
-      </button>
-    </div>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => setShowRegister(true)}
+          >
+            Create New Account
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 

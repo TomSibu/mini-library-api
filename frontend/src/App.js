@@ -2,9 +2,19 @@ import React, { useState, useEffect } from "react";
 import Login from "./Login";
 import Books from "./Books";
 import DeleteAccount from "./DeleteAccount";
-import { jwtDecode } from "jwt-decode";
 import AddBook from "./AddBook";
+import { jwtDecode } from "jwt-decode";
 
+// MUI Components
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Container,
+  Box,
+  Chip,
+} from "@mui/material";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -16,12 +26,8 @@ function App() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-
-        // 👤 Extract user details from JWT
         setUsername(decoded.username || "User");
         setIsSuperuser(decoded.is_superuser || false);
-
-        console.log("Decoded Token:", decoded); // Debug (optional)
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -30,76 +36,80 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    alert("Logged out successfully");
     window.location.reload();
   };
 
-  // If not logged in → show login
+  // 🔐 Not Logged In → Show Login Page
   if (!token) {
     return (
-      <div style={{ padding: "20px" }}>
-        <h1>Library Management System</h1>
+      <Container maxWidth="sm" sx={{ mt: 8 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Library Management System
+        </Typography>
         <Login />
-      </div>
+      </Container>
     );
   }
 
-  // Delete Account Page
+  // 🗑️ Delete Account Page
   if (showDeletePage) {
     return (
-      <div style={{ padding: "20px" }}>
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
         <DeleteAccount onBackToApp={() => setShowDeletePage(false)} />
-      </div>
+      </Container>
     );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Library Management System</h1>
+    <>
+      {/* 🔝 TOP NAVBAR */}
+      <AppBar position="static" elevation={0}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            📚 Library Management System
+          </Typography>
 
-      {/* 👤 USER HEADER */}
-      <div
-        style={{
-          backgroundColor: "#f0f0f0",
-          padding: "10px",
-          marginBottom: "20px",
-          borderRadius: "8px",
-        }}
-      >
-        <strong>
-          Welcome, {username} 👋 {isSuperuser ? "(Admin)" : "(User)"}
-        </strong>
-      </div>
+          <Chip
+            label={`Welcome, ${username}`}
+            variant="outlined"
+            sx={{ mr: 2 }}
+          />
 
-      {/* 🔓 ACTION BUTTONS */}
-      <button
-        onClick={handleLogout}
-        style={{ marginRight: "10px" }}
-      >
-        Logout
-      </button>
+          <Chip
+            label={isSuperuser ? "Admin" : "User"}
+            variant="outlined"
+            sx={{ mr: 2 }}
+          />
 
-      {/* 🔴 ONLY SHOW FOR NORMAL USERS (NOT SUPERUSERS) */}
-      {!isSuperuser && (
-        <button
-          onClick={() => setShowDeletePage(true)}
-          style={{ backgroundColor: "red", color: "white" }}
-        >
-          Delete My Account
-        </button>
-      )}
+          {!isSuperuser && (
+            <Button
+              variant="contained"
+              onClick={() => setShowDeletePage(true)}
+              sx={{ mr: 2 }}
+            >
+              Delete Account
+            </Button>
+          )}
 
-      <hr />
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
 
-    {/* 📚 ADMIN ONLY: Add Book Panel */}
-    {isSuperuser && (
-      <AddBook onBookAdded={() => window.location.reload()} />
-    )}
+      {/* 📦 MAIN CONTENT */}
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {/* 👑 Admin Add Book Panel */}
+        {isSuperuser && (
+          <Box mb={4}>
+            <AddBook />
+          </Box>
+        )}
 
-    <Books isSuperuser={isSuperuser} />
-
-
-    </div>
+        {/* 📚 Books + My Borrows */}
+        <Books isSuperuser={isSuperuser} />
+      </Container>
+    </>
   );
 }
 

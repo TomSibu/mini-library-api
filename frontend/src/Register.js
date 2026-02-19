@@ -1,25 +1,36 @@
 import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+  Stack,
+} from "@mui/material";
 
 function Register({ onRegisterSuccess }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleRegister = async () => {
-    // 🔴 Frontend Validation (Compulsory Fields)
+    setError("");
+    setSuccess("");
+
+    // 🔒 Required Field Validation (Compulsory fields)
     if (!username.trim() || !email.trim() || !password.trim()) {
       setError("All fields (Username, Email, Password) are required.");
       return;
     }
 
-    // Optional: password strength check (recommended)
     if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
       return;
     }
-
-    setError(""); // Clear previous error
 
     try {
       const response = await fetch(
@@ -29,69 +40,115 @@ function Register({ onRegisterSuccess }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+          }),
         }
       );
 
       const data = await response.json();
 
       if (response.status === 201) {
-        alert("User registered successfully! Please login.");
-        onRegisterSuccess(); // Auto return to login
+        setSuccess("Account created successfully. Please login.");
+        setUsername("");
+        setEmail("");
+        setPassword("");
+
+        // Auto return to login after 1.5 seconds
+        setTimeout(() => {
+          onRegisterSuccess();
+        }, 1500);
       } else {
-        setError(data.detail || JSON.stringify(data));
+        // Clean error message (not raw JSON)
+        if (data.username) {
+          setError("Username already exists.");
+        } else if (data.email) {
+          setError("Invalid email address.");
+        } else {
+          setError("Registration failed. Please try again.");
+        }
       }
     } catch (error) {
       console.error("Register error:", error);
-      setError("Server error during registration");
+      setError("Server error during registration.");
     }
   };
 
   return (
-    <div>
-      <h2>Register New User</h2>
+    <Card elevation={0} sx={{ border: "1px solid #e5e7eb" }}>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          Create Account
+        </Typography>
 
-      {/* 🔴 Error Message Display */}
-      {error && (
-        <p style={{ color: "red", fontWeight: "bold" }}>
-          {error}
-        </p>
-      )}
+        <Typography variant="body2" color="text.secondary" mb={2}>
+          Register a new library account
+        </Typography>
 
-      <input
-        placeholder="Username (Required)"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <br /><br />
+        <Stack spacing={2}>
+          {error && (
+            <Alert severity="error" variant="outlined">
+              {error}
+            </Alert>
+          )}
 
-      <input
-        type="email"
-        placeholder="Email (Required)"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <br /><br />
+          {success && (
+            <Alert severity="success" variant="outlined">
+              {success}
+            </Alert>
+          )}
 
-      <input
-        type="password"
-        placeholder="Password (Required)"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br /><br />
+          <TextField
+            label="Username"
+            placeholder="Enter your username"
+            fullWidth
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
-      <button onClick={handleRegister}>
-        Register
-      </button>
+          <TextField
+            label="Email"
+            type="email"
+            placeholder="Enter your email"
+            fullWidth
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-      <br /><br />
+          <TextField
+            label="Password"
+            type="password"
+            placeholder="Enter your password"
+            fullWidth
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      {/* Optional Back Button (Professional UX) */}
-      <button onClick={onRegisterSuccess}>
-        Back to Login
-      </button>
-    </div>
+          <Box display="flex" gap={2} mt={1}>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleRegister}
+            >
+              Register
+            </Button>
+
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={onRegisterSuccess}
+            >
+              Back to Login
+            </Button>
+          </Box>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }
 

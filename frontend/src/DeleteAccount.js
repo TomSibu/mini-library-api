@@ -1,16 +1,27 @@
 import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+} from "@mui/material";
 
 function DeleteAccount({ onBackToApp }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const token = localStorage.getItem("token");
+
   const handleDelete = async () => {
-    if (!password.trim()) {
+    setError("");
+
+    if (!password) {
       setError("Password is required.");
       return;
     }
-
-    const token = localStorage.getItem("token");
 
     try {
       const response = await fetch(
@@ -30,9 +41,9 @@ function DeleteAccount({ onBackToApp }) {
       if (response.status === 200) {
         alert("Account deleted successfully.");
         localStorage.removeItem("token");
-        window.location.reload(); // Back to login page
+        window.location.reload();
       } else {
-        setError(data.error || "Account deletion failed.");
+        setError(data.error || "Failed to delete account.");
       }
     } catch (err) {
       console.error(err);
@@ -41,34 +52,50 @@ function DeleteAccount({ onBackToApp }) {
   };
 
   return (
-    <div>
-      <h2>Delete Account</h2>
-      <p style={{ color: "red", fontWeight: "bold" }}>
-        Warning: This action is permanent!
-      </p>
+    <Card elevation={6} sx={{ border: "2px solid red" }}>
+      <CardContent>
+        <Typography variant="h4" color="error" gutterBottom>
+          ⚠ Delete Account
+        </Typography>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          This action is permanent. You cannot recover your account after deletion.
+          Make sure you have returned all borrowed books.
+        </Alert>
 
-      <input
-        type="password"
-        placeholder="Enter your password to confirm"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br /><br />
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      <button
-        onClick={handleDelete}
-        style={{ backgroundColor: "red", color: "white" }}
-      >
-        Confirm Delete Account
-      </button>
+        <Typography variant="body1" gutterBottom>
+          Enter your password to confirm account deletion:
+        </Typography>
 
-      <br /><br />
+        <TextField
+          label="Password"
+          type="password"
+          fullWidth
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          sx={{ mt: 1 }}
+        />
 
-      <button onClick={onBackToApp}>
-        Cancel & Go Back
-      </button>
-    </div>
+        <Box mt={3} display="flex" gap={2}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDelete}
+          >
+            Confirm Delete Account
+          </Button>
+
+          <Button
+            variant="outlined"
+            onClick={onBackToApp}
+          >
+            Cancel & Go Back
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 

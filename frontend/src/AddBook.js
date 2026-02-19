@@ -1,14 +1,28 @@
 import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+  Grid,
+} from "@mui/material";
 
-function AddBook({ onBookAdded }) {
+function AddBook() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [isbn, setIsbn] = useState("");
   const [totalCopies, setTotalCopies] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const token = localStorage.getItem("token");
 
   const handleAddBook = async () => {
-    const token = localStorage.getItem("token");
+    setError("");
+    setSuccess("");
 
     // 🔴 Validation
     if (!title || !author || !isbn || !totalCopies) {
@@ -35,64 +49,81 @@ function AddBook({ onBookAdded }) {
       const data = await response.json();
 
       if (response.status === 201) {
-        alert("Book added successfully!");
+        setSuccess("Book added successfully!");
         setTitle("");
         setAuthor("");
         setIsbn("");
         setTotalCopies("");
-        setError("");
-        onBookAdded(); // refresh books list
       } else {
-        setError(data.detail || JSON.stringify(data));
+        setError(data.detail || "Failed to add book.");
       }
     } catch (err) {
       console.error(err);
-      setError("Error adding book.");
+      setError("Server error while adding book.");
     }
   };
 
   return (
-    <div style={{ border: "2px solid green", padding: "15px", marginBottom: "20px" }}>
-      <h2>📚 Add New Book</h2>
+    <Card elevation={4}>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          📚 Add New Book (Admin)
+        </Typography>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-      <input
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <br /><br />
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Book Title"
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Grid>
 
-      <input
-        placeholder="Author"
-        value={author}
-        onChange={(e) => setAuthor(e.target.value)}
-      />
-      <br /><br />
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Author"
+              fullWidth
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+            />
+          </Grid>
 
-      <input
-        placeholder="ISBN"
-        value={isbn}
-        onChange={(e) => setIsbn(e.target.value)}
-      />
-      <br /><br />
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="ISBN"
+              fullWidth
+              value={isbn}
+              onChange={(e) => setIsbn(e.target.value)}
+            />
+          </Grid>
 
-      <input
-        type="number"
-        placeholder="Total Copies"
-        value={totalCopies}
-        onChange={(e) => setTotalCopies(e.target.value)}
-      />
-      <br /><br />
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Total Copies"
+              type="number"
+              fullWidth
+              value={totalCopies}
+              onChange={(e) => setTotalCopies(e.target.value)}
+            />
+          </Grid>
+        </Grid>
 
-      <button
-        onClick={handleAddBook}
-        style={{ backgroundColor: "green", color: "white" }}
-      >
-        Add Book
-      </button>
-    </div>
+        <Box mt={3}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handleAddBook}
+          >
+            Add Book
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 
