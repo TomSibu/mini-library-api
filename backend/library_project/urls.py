@@ -20,8 +20,15 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    
+
     path("api/auth/", include("users.urls")),  # Include URLs from the users app
     # POST /api/auth/register/
     # POST /api/auth/login/
+
+    path("api/", include("books.urls")),  # Include URLs from the books app
+    # GET /api/books/
+    # POST /api/books/
+    # GET /api/books/{id}/
+    # PUT /api/books/{id}/
+    # DELETE /api/books/{id}/
 ]
