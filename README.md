@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=TomSibu.mini-library-api" />
+</div>
+
 # mini-library-api
 
 Mini Library API is a small full‑stack project (Django REST backend + React frontend) for managing a simple library system. Users can register, log in, browse books, borrow and return them, while admins can manage books and users through an admin portal.
