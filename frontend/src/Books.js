@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -27,35 +27,41 @@ function Books({ isSuperuser }) {
   useEffect(() => {
     fetchBooks();
     fetchMyBorrows();
-  }, []);
+  }, [fetchBooks, fetchMyBorrows]);
 
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/books/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/books/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       setBooks(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching books:", error);
     }
-  };
+  }, [token]);
 
-  const fetchMyBorrows = async () => {
+  const fetchMyBorrows = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/my-borrows/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/my-borrows/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       setMyBorrows(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching borrows:", error);
     }
-  };
+  }, [token]);
 
   const currentBorrows = myBorrows.filter(
     (b) => b.is_returned === false
