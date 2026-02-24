@@ -31,7 +31,7 @@ function Books({ isSuperuser }) {
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/books/", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/books/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -45,7 +45,7 @@ function Books({ isSuperuser }) {
 
   const fetchMyBorrows = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/my-borrows/", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/my-borrows/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -70,7 +70,7 @@ function Books({ isSuperuser }) {
   };
 
   const borrowBook = async (id) => {
-    const res = await fetch(`http://127.0.0.1:8000/api/borrow/${id}/`, {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/borrow/${id}/`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -81,7 +81,7 @@ function Books({ isSuperuser }) {
   };
 
   const returnBook = async (id) => {
-    const res = await fetch(`http://127.0.0.1:8000/api/return/${id}/`, {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/return/${id}/`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -95,7 +95,7 @@ function Books({ isSuperuser }) {
     if (!window.confirm("Delete this book?")) return;
 
     const res = await fetch(
-      `http://127.0.0.1:8000/api/books/${id}/`,
+      `${process.env.REACT_APP_API_URL}/api/books/${id}/`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -137,7 +137,7 @@ function Books({ isSuperuser }) {
 
     try {
         const response = await fetch(
-        `http://127.0.0.1:8000/api/books/${book.id}/`,
+        `${process.env.REACT_APP_API_URL}/api/books/${book.id}/`,
         {
             method: "PUT",
             headers: {

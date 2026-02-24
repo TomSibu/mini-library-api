@@ -51,7 +51,7 @@ function Register({ onRegisterSuccess }) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/auth/register/",
+        `${process.env.REACT_APP_API_URL}/api/auth/register/`,
         {
           method: "POST",
           headers: {

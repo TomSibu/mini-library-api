@@ -20,7 +20,7 @@ function AdminUsers() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/users/", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/users/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,7 +42,7 @@ function AdminUsers() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/auth/users/${id}/`,
+        `${process.env.REACT_APP_API_URL}/api/auth/users/${id}/`,
         {
           method: "DELETE",
           headers: {

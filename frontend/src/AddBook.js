@@ -56,7 +56,7 @@ function AddBook() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/books/", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/books`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

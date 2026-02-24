@@ -25,7 +25,7 @@ function DeleteAccount({ onBackToApp }) {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/auth/delete-account/",
+        `${process.env.REACT_APP_API_URL}/api/auth/delete-account/`,
         {
           method: "POST",
           headers: {
