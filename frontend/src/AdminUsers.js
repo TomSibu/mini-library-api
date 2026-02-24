@@ -14,9 +14,7 @@ function AdminUsers() {
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -39,6 +37,10 @@ function AdminUsers() {
       setError("Server error while fetching users.");
     }
   }, [token]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const deleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;

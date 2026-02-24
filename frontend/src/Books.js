@@ -24,10 +24,6 @@ function Books({ isSuperuser }) {
   const token = localStorage.getItem("token");
   const booksPerPage = 6;
 
-  useEffect(() => {
-    fetchBooks();
-    fetchMyBorrows();
-  }, [fetchBooks, fetchMyBorrows]);
 
   const fetchBooks = useCallback(async () => {
     try {
@@ -62,6 +58,11 @@ function Books({ isSuperuser }) {
       console.error("Error fetching borrows:", error);
     }
   }, [token]);
+
+  useEffect(() => {
+    fetchBooks();
+    fetchMyBorrows();
+  }, [fetchBooks, fetchMyBorrows]);
 
   const currentBorrows = myBorrows.filter(
     (b) => b.is_returned === false
